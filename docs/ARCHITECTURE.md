@@ -6,7 +6,7 @@ StickyNote is a Swift package with two modules. Its one dependency is
 ```
 Sources/
   StickyNoteCore/        Model and storage. Foundation only, no UI, fully unit tested.
-    Notes/               Note, NoteColor, NoteFrame, TextStyle, StyleRun
+    Notes/               Note, NoteColor, FontOverride, NoteFrame, TextStyle, StyleRun
     Storage/             NoteStore: reads and writes notes.json
     Settings/            FontSettings, NewNoteDefaults, and the KeyValueStore they are saved to
   StickyNote/            The macOS app (AppKit, with SwiftUI for small views)
@@ -25,8 +25,8 @@ scripts/                 Build, packaging and release helpers
 
 - **`NotesController`** owns every open note. It loads notes at launch, creates and deletes
   note windows, and saves all notes to the `NoteStore` half a second after the last change.
-- **`NoteWindowController`** manages one note's window: its text view, color, and Keep on Top
-  window level. Edits flow into its **`NoteModel`**, which reports them back to `NotesController`
+- **`NoteWindowController`** manages one note's window: its text view, color, font, and Keep
+  on Top window level. Edits flow into its **`NoteModel`**, which reports them back to `NotesController`
   so they get saved.
 - **`RichText`** converts between what the text view displays and what is stored: plain text
   plus a list of `StyleRun`s (for example "bold from character 0, length 5"). Because the
@@ -49,6 +49,7 @@ Notes are stored as readable JSON in `~/Library/Application Support/StickyNote/n
       "text" : "Shopping list\nmilk",
       "styles" : [{ "style" : "bold", "location" : 0, "length" : 13 }],
       "color" : "yellow",
+      "font" : { "size" : 18 },
       "isPinned" : true,
       "frame" : { "x" : 300, "y" : 300, "width" : 260, "height" : 240 },
       "createdAt" : "2026-10-16T08:00:00Z",
@@ -71,7 +72,7 @@ Users' notes must never be lost, so changes to this format follow these rules:
 
 ## Common changes
 
-**A new note property** (say, a per-note font size): add it to `Note` (with `decodeIfPresent`),
+**A new note property** (say, a per-note opacity): add it to `Note` (with `decodeIfPresent`),
 `NoteModel`, and `NoteModel.note`; apply it in `NoteWindowController`; add a test in
 `NoteStoreTests` that the property survives saving and loading.
 

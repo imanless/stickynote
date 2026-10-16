@@ -4,14 +4,12 @@ import SwiftUI
 /// A row of paper colors to pick from, with a checkmark on the current one.
 struct ColorSwatches: View {
     @Binding var selection: NoteColor
-    var onSelect: () -> Void = {}
 
     var body: some View {
         HStack(spacing: 8) {
             ForEach(NoteColor.allCases, id: \.self) { color in
                 Button {
                     selection = color
-                    onSelect()
                 } label: {
                     swatch(for: color)
                 }

@@ -33,6 +33,13 @@ final class AppSettings {
 }
 
 extension FontSettings {
+    /// The font families installed on this Mac, for font menus.
+    @MainActor static let installedFamilies = NSFontManager.shared.availableFontFamilies.sorted()
+
+    var familyName: String {
+        family ?? "System Font"
+    }
+
     /// The regular face of the chosen family, or the system font if that family isn't installed.
     @MainActor
     var nsFont: NSFont {

@@ -1,23 +1,24 @@
 import StickyNoteCore
 import SwiftUI
 
-/// The color and pin buttons shown at the right of a note's title bar.
+/// The style and pin buttons shown at the right of a note's title bar.
 struct NoteTitlebarControls: View {
     @Bindable var model: NoteModel
-    @State private var isChoosingColor = false
+    let settings: AppSettings
+    @State private var isShowingStyle = false
 
     var body: some View {
         HStack(spacing: 4) {
             Button {
-                isChoosingColor.toggle()
+                isShowingStyle.toggle()
             } label: {
                 Image(systemName: "paintpalette")
             }
             .buttonStyle(.borderless)
-            .help("Change Color")
-            .accessibilityLabel("Change Color")
-            .popover(isPresented: $isChoosingColor, arrowEdge: .bottom) {
-                ColorSwatches(selection: $model.color) { isChoosingColor = false }
+            .help("Color and Font")
+            .accessibilityLabel("Color and Font")
+            .popover(isPresented: $isShowingStyle, arrowEdge: .bottom) {
+                NoteStylePanel(model: model, settings: settings)
             }
 
             Button {

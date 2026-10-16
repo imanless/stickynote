@@ -18,18 +18,21 @@ final class NoteWindowController: NSWindowController, NSWindowDelegate, NSMenuIt
     let model: NoteModel
     weak var delegate: (any NoteWindowControllerDelegate)?
 
-    /// How the note's text is drawn; changes when the user picks another font in Settings.
-    var richText: RichText {
-        didSet { redrawText() }
-    }
+    /// Provides the app-wide default font that the note's own font choices are applied to.
+    private let settings: AppSettings
+    /// The font the text is drawn in: the default, with the note's own choices applied.
+    private var font: FontSettings
+    private var richText: RichText
 
     private let textView = NoteWindowController.makeTextView()
     /// Distinguishes the user deleting the note from the window closing for any other reason.
     private var isDeleting = false
 
-    init(model: NoteModel, richText: RichText) {
+    init(model: NoteModel, settings: AppSettings) {
         self.model = model
-        self.richText = richText
+        self.settings = settings
+        font = model.font.applied(to: settings.font)
+        richText = RichText(font: font.nsFont)
         let window = NSWindow(
             contentRect: model.frame.rect,
             styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
@@ -125,7 +128,7 @@ final class NoteWindowController: NSWindowController, NSWindowDelegate, NSMenuIt
     }
 
     private func installTitlebarControls(in window: NSWindow) {
-        let controls = NSHostingView(rootView: NoteTitlebarControls(model: model))
+        let controls = NSHostingView(rootView: NoteTitlebarControls(model: model, settings: settings))
         controls.frame.size = controls.fittingSize
         let accessory = NSTitlebarAccessoryViewController()
         accessory.view = controls
@@ -153,7 +156,17 @@ final class NoteWindowController: NSWindowController, NSWindowDelegate, NSMenuIt
 
     private func noteDidChange() {
         applyNoteState()
+        updateFont()
         delegate?.noteWindowControllerDidChangeNote(self)
+    }
+
+    /// Redraws the text if the note's own font or the app-wide default now gives another font.
+    func updateFont() {
+        let newFont = model.font.applied(to: settings.font)
+        guard newFont != font else { return }
+        font = newFont
+        richText = RichText(font: newFont.nsFont)
+        redrawText()
     }
 
     private func applyNoteState() {
@@ -189,8 +202,26 @@ final class NoteWindowController: NSWindowController, NSWindowDelegate, NSMenuIt
         textView.toggle(style, using: richText)
     }
 
+    @objc func makeTextBigger(_ sender: Any?) {
+        stepTextSize(larger: true)
+    }
+
+    @objc func makeTextSmaller(_ sender: Any?) {
+        stepTextSize(larger: false)
+    }
+
+    private func stepTextSize(larger: Bool) {
+        let size = FontSettings.nextStandardSize(from: font.size, larger: larger)
+        // Landing on the default size goes back to following the default.
+        model.font.size = size == settings.font.size ? nil : size
+    }
+
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         switch menuItem.action {
+        case #selector(makeTextBigger(_:)):
+            return FontSettings.nextStandardSize(from: font.size, larger: true) != font.size
+        case #selector(makeTextSmaller(_:)):
+            return FontSettings.nextStandardSize(from: font.size, larger: false) != font.size
         case #selector(toggleKeepOnTop(_:)):
             menuItem.state = model.isPinned ? .on : .off
         case #selector(changeNoteColor(_:)):

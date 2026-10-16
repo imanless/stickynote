@@ -95,6 +95,19 @@ enum MainMenu {
         ).keyEquivalentModifierMask = [.command, .shift]
 
         menu.addItem(.separator())
+        menu.addItem(.sectionHeader(title: "Text Size"))
+        menu.addItem(
+            withTitle: "Bigger",
+            action: #selector(NoteWindowController.makeTextBigger(_:)),
+            keyEquivalent: "+"
+        )
+        menu.addItem(
+            withTitle: "Smaller",
+            action: #selector(NoteWindowController.makeTextSmaller(_:)),
+            keyEquivalent: "-"
+        )
+
+        menu.addItem(.separator())
         menu.addItem(.sectionHeader(title: "Color"))
         for (index, color) in NoteColor.allCases.enumerated() {
             let item = menu.addItem(

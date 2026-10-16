@@ -2,8 +2,8 @@ import Foundation
 import Observation
 import StickyNoteCore
 
-/// The live state of one open note. The SwiftUI title bar controls observe its color and pin
-/// state; `onChange` lets the window controller react to every edit (update the window, save).
+/// The live state of one open note. The SwiftUI title bar controls observe its color, font and
+/// pin state; `onChange` lets the window controller react to every edit (update the window, save).
 @MainActor
 @Observable
 final class NoteModel {
@@ -11,6 +11,9 @@ final class NoteModel {
     let createdAt: Date
 
     var color: NoteColor {
+        didSet { onChange?() }
+    }
+    var font: FontOverride {
         didSet { onChange?() }
     }
     var isPinned: Bool {
@@ -33,6 +36,7 @@ final class NoteModel {
         text = note.text
         styles = note.styles
         color = note.color
+        font = note.font
         isPinned = note.isPinned
         frame = note.frame
         modifiedAt = note.modifiedAt
@@ -52,6 +56,7 @@ final class NoteModel {
             text: text,
             styles: styles,
             color: color,
+            font: font,
             frame: frame,
             isPinned: isPinned,
             createdAt: createdAt,

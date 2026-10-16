@@ -62,13 +62,15 @@ struct StyleRunTests {
 }
 
 struct NoteDecodingTests {
-    private func decodeNote(styles stylesJSON: String?) throws -> Note {
+    private func decodeNote(styles stylesJSON: String? = nil, font fontJSON: String? = nil) throws -> Note {
         let stylesField = stylesJSON.map { #""styles": \#($0),"# } ?? ""
+        let fontField = fontJSON.map { #""font": \#($0),"# } ?? ""
         let json = """
             {
               "id": "11111111-1111-1111-1111-111111111111",
               "text": "Hello world",
               \(stylesField)
+              \(fontField)
               "color": "yellow",
               "frame": {"x": 0, "y": 0, "width": 200, "height": 200},
               "isPinned": false,
@@ -97,5 +99,20 @@ struct NoteDecodingTests {
                 """
         )
         #expect(note.styles == [StyleRun(style: .bold, location: 0, length: 5)])
+    }
+
+    @Test func noteSavedBeforePerNoteFontsUsesTheDefault() throws {
+        #expect(try decodeNote().font == FontOverride())
+    }
+
+    @Test func noteFontIsRead() throws {
+        let note = try decodeNote(font: #"{"family": "Menlo", "size": 18}"#)
+        #expect(note.font == FontOverride(family: "Menlo", size: 18))
+    }
+
+    @Test func unreadableFontFallsBackToTheDefaultAndKeepsTheNote() throws {
+        let note = try decodeNote(font: #"{"size": "huge"}"#)
+        #expect(note.text == "Hello world")
+        #expect(note.font == FontOverride())
     }
 }

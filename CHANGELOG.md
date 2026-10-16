@@ -6,6 +6,14 @@ All notable changes to StickyNote are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-16
+
+### Added
+
+- Each note can have its own font and text size. Click the note's palette button and choose
+  them below the colors; "Default" follows the font and size set in Settings.
+- Note → Bigger (⌘+) and Smaller (⌘-) change the text size of the current note.
+
 ## [0.4.0] - 2026-10-16
 
 ### Changed
@@ -39,7 +47,8 @@ All notable changes to StickyNote are listed here. The format follows
 - Six note colors.
 - Notes save automatically and reopen where you left them.
 
-[Unreleased]: https://github.com/imanless/stickynote/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/imanless/stickynote/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/imanless/stickynote/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/imanless/stickynote/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/imanless/stickynote/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/imanless/stickynote/compare/v0.1.0...v0.2.0

@@ -10,6 +10,8 @@ public struct Note: Codable, Equatable, Identifiable, Sendable {
     /// Bold, italic and other formatting applied to ranges of `text`.
     public var styles: [StyleRun]
     public var color: NoteColor
+    /// The note's own font choices, on top of the app-wide default.
+    public var font: FontOverride
     public var frame: NoteFrame
     /// Whether the note floats above other applications' windows.
     public var isPinned: Bool
@@ -21,6 +23,7 @@ public struct Note: Codable, Equatable, Identifiable, Sendable {
         text: String = "",
         styles: [StyleRun] = [],
         color: NoteColor = .yellow,
+        font: FontOverride = FontOverride(),
         frame: NoteFrame,
         isPinned: Bool = false,
         createdAt: Date = Date(),
@@ -30,6 +33,7 @@ public struct Note: Codable, Equatable, Identifiable, Sendable {
         self.text = text
         self.styles = styles
         self.color = color
+        self.font = font
         self.frame = frame
         self.isPinned = isPinned
         self.createdAt = createdAt
@@ -46,6 +50,9 @@ public struct Note: Codable, Equatable, Identifiable, Sendable {
             try container.decodeIfPresent([SkippingInvalid<StyleRun>].self, forKey: .styles)?
             .compactMap(\.value) ?? []
         color = try container.decode(NoteColor.self, forKey: .color)
+        // Missing in notes saved before per-note fonts; an unreadable value falls back to the
+        // default font rather than making the whole note unreadable.
+        font = (try? container.decodeIfPresent(FontOverride.self, forKey: .font)) ?? FontOverride()
         frame = try container.decode(NoteFrame.self, forKey: .frame)
         isPinned = try container.decode(Bool.self, forKey: .isPinned)
         createdAt = try container.decode(Date.self, forKey: .createdAt)

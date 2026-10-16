@@ -30,10 +30,6 @@ final class NotesController: NoteWindowControllerDelegate {
         settings.onFontChange = { [weak self] in self?.fontDidChange() }
     }
 
-    private var richText: RichText {
-        RichText(font: settings.font.nsFont)
-    }
-
     var hasNotes: Bool {
         !windowControllers.isEmpty
     }
@@ -100,14 +96,13 @@ final class NotesController: NoteWindowControllerDelegate {
     // MARK: - Private
 
     private func fontDidChange() {
-        let richText = richText
         for controller in windowControllers {
-            controller.richText = richText
+            controller.updateFont()
         }
     }
 
     private func open(_ model: NoteModel) {
-        let controller = NoteWindowController(model: model, richText: richText)
+        let controller = NoteWindowController(model: model, settings: settings)
         controller.delegate = self
         windowControllers.append(controller)
         controller.showWindow(nil)

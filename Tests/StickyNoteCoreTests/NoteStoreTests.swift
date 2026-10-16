@@ -32,6 +32,7 @@ final class NoteStoreTests {
                     StyleRun(style: .strikethrough, location: 9, length: 8),
                 ],
                 color: .pink,
+                font: FontOverride(family: "Menlo", size: 18),
                 frame: NoteFrame(x: 10, y: 20, width: 300, height: 250),
                 isPinned: true,
                 createdAt: Date(timeIntervalSince1970: 1_700_000_000),

@@ -2,14 +2,11 @@ import AppKit
 import StickyNoteCore
 import SwiftUI
 
-/// Lets the user choose how new notes start out, the font and text size of every note, and how
-/// updates are checked.
+/// Lets the user choose how new notes start out, the default font and text size, and how updates
+/// are checked.
 struct SettingsView: View {
-    private static let standardSizes: [Double] = [10, 11, 12, 13, 14, 16, 18, 20, 24, 28, 32, 36, 48]
-
     @Bindable var settings: AppSettings
     @Bindable var updater: AppUpdater
-    private let fontFamilies = NSFontManager.shared.availableFontFamilies.sorted()
     private let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
 
     var body: some View {
@@ -21,20 +18,25 @@ struct SettingsView: View {
                 }
             }
 
-            Section("Text") {
+            Section {
                 Picker("Font", selection: $settings.font.family) {
                     Text("System Font").tag(String?.none)
                     Divider()
-                    ForEach(fontFamilies, id: \.self) { family in
+                    ForEach(FontSettings.installedFamilies, id: \.self) { family in
                         Text(family).tag(String?.some(family))
                     }
                 }
 
                 Picker("Size", selection: $settings.font.size) {
-                    ForEach(sizes, id: \.self) { size in
+                    ForEach(FontSettings.sizeChoices(including: settings.font.size), id: \.self) { size in
                         Text("\(size.formatted()) pt").tag(size)
                     }
                 }
+            } header: {
+                Text("Text")
+            } footer: {
+                Text("Used by every note that doesn’t have its own font. To change one note, use its palette button.")
+                    .foregroundStyle(.secondary)
             }
 
             Section("Preview") {
@@ -60,10 +62,5 @@ struct SettingsView: View {
         .formStyle(.grouped)
         .frame(width: 420)
         .fixedSize(horizontal: false, vertical: true)
-    }
-
-    /// The standard sizes, plus the current one if it was set to something else.
-    private var sizes: [Double] {
-        Set(Self.standardSizes + [settings.font.size]).sorted()
     }
 }

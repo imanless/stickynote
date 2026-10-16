@@ -4,6 +4,8 @@ import Foundation
 public struct FontSettings: Equatable, Sendable {
     public static let sizeRange: ClosedRange<Double> = 9...72
     public static let standard = FontSettings(family: nil, size: defaultSize)
+    /// The sizes offered in menus, and the steps of Bigger Text and Smaller Text.
+    public static let standardSizes: [Double] = [10, 11, 12, 13, 14, 16, 18, 20, 24, 28, 32, 36, 48]
 
     private static let defaultSize: Double = 14
     private static let familyKey = "FontFamily"
@@ -38,5 +40,18 @@ public struct FontSettings: Equatable, Sendable {
             store.removeObject(forKey: Self.familyKey)
         }
         store.set(size, forKey: Self.sizeKey)
+    }
+}
+
+extension FontSettings {
+    /// The standard sizes, plus `size` if it is set to something else, in order.
+    public static func sizeChoices(including size: Double?) -> [Double] {
+        Set(standardSizes + [size].compactMap { $0 }).sorted()
+    }
+
+    /// The next standard size above or below `size`, or `size` itself when there is none.
+    public static func nextStandardSize(from size: Double, larger: Bool) -> Double {
+        let next = larger ? standardSizes.first { $0 > size } : standardSizes.last { $0 < size }
+        return next ?? size
     }
 }

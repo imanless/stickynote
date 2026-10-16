@@ -60,7 +60,8 @@ defaults delete io.github.imanless.StickyNote
 
 ## Building from source
 
-Requires Xcode 16.3 or later.
+Requires Xcode 26 or later. Older versions down to Xcode 16.3 also build it, but the app then
+uses the look from before macOS 26.
 
 ```sh
 git clone https://github.com/imanless/stickynote.git

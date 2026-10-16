@@ -11,3 +11,12 @@ DerivedData/
 
 # macOS
 .DS_Store
+
+# Signing material: never commit these
+*.p12
+*.p8
+*.cer
+*.certSigningRequest
+*.mobileprovision
+*.keychain-db
+.env

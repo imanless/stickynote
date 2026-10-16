@@ -5,14 +5,26 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-and-test:
     runs-on: macos-15
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - name: Show Swift version
-        run: swift --version
+      - name: Show toolchain
+        run: |
+          xcodebuild -version
+          swift --version
 
       - name: Check formatting
         run: make lint
@@ -20,5 +32,5 @@ jobs:
       - name: Run tests
         run: make test
 
-      - name: Build app bundle
-        run: make app
+      - name: Build app and disk image
+        run: make dmg

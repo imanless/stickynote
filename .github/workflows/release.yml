@@ -1,0 +1,127 @@
+name: Release
+
+# Pushing a tag such as v1.2.0 builds the app, packages it, and publishes a GitHub release.
+# Signing and notarization run only when the secrets in docs/RELEASING.md are configured.
+
+on:
+  push:
+    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: macos-15
+    timeout-minutes: 60
+    environment: release
+    permissions:
+      contents: write # create the release
+      id-token: write # sign the build provenance attestation
+      attestations: write # store the attestation
+    env:
+      HAS_SIGNING_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE_P12_BASE64 != '' }}
+      HAS_NOTARY_KEY: ${{ secrets.NOTARY_API_KEY_P8_BASE64 != '' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Read version from tag
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+
+      - name: Extract release notes
+        run: scripts/changelog-section.sh "$VERSION" > "$RUNNER_TEMP/release-notes.md"
+
+      - name: Run tests
+        run: make test
+
+      - name: Import signing certificate
+        if: env.HAS_SIGNING_CERTIFICATE == 'true'
+        env:
+          CERTIFICATE_P12_BASE64: ${{ secrets.MACOS_CERTIFICATE_P12_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+        run: |
+          keychain="$RUNNER_TEMP/signing.keychain-db"
+          keychain_password="$(uuidgen)"
+          certificate="$RUNNER_TEMP/certificate.p12"
+          trap 'rm -f "$certificate"' EXIT
+
+          base64 --decode <<< "$CERTIFICATE_P12_BASE64" > "$certificate"
+          security create-keychain -p "$keychain_password" "$keychain"
+          security set-keychain-settings -lut 3600 "$keychain"
+          security unlock-keychain -p "$keychain_password" "$keychain"
+          security import "$certificate" -k "$keychain" -P "$CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$keychain_password" "$keychain" > /dev/null
+          security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
+
+          # Refer to the certificate by its hash, so the account name isn't printed in the logs.
+          identity="$(security find-identity -v -p codesigning "$keychain" | awk '/Developer ID Application/ { print $2; exit }')"
+          if [[ -z "$identity" ]]; then
+            echo "::error::No Developer ID Application certificate found in MACOS_CERTIFICATE_P12_BASE64"
+            exit 1
+          fi
+          echo "SIGNING_IDENTITY=$identity" >> "$GITHUB_ENV"
+
+      - name: Build app
+        env:
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: scripts/build-app.sh
+
+      - name: Create disk image
+        run: scripts/make-dmg.sh
+
+      - name: Notarize disk image
+        if: env.HAS_SIGNING_CERTIFICATE == 'true' && env.HAS_NOTARY_KEY == 'true'
+        env:
+          NOTARY_API_KEY_P8_BASE64: ${{ secrets.NOTARY_API_KEY_P8_BASE64 }}
+          NOTARY_API_KEY_ID: ${{ secrets.NOTARY_API_KEY_ID }}
+          NOTARY_API_ISSUER_ID: ${{ secrets.NOTARY_API_ISSUER_ID }}
+        run: |
+          key="$RUNNER_TEMP/notary-key.p8"
+          trap 'rm -f "$key"' EXIT
+          base64 --decode <<< "$NOTARY_API_KEY_P8_BASE64" > "$key"
+
+          dmg="build/StickyNote-$VERSION.dmg"
+          xcrun notarytool submit "$dmg" --key "$key" --key-id "$NOTARY_API_KEY_ID" --issuer "$NOTARY_API_ISSUER_ID" --wait
+          xcrun stapler staple "$dmg"
+          echo "NOTARIZED=true" >> "$GITHUB_ENV"
+
+      - name: Explain first launch of unnotarized builds
+        if: env.NOTARIZED != 'true'
+        run: |
+          cat >> "$RUNNER_TEMP/release-notes.md" <<EOF
+
+          ---
+          This build isn't notarized by Apple, so macOS asks you to approve it the first time you
+          open it. See [Installing](https://github.com/$GITHUB_REPOSITORY#installing) for the steps.
+          EOF
+
+      - name: Compute checksum
+        working-directory: build
+        run: shasum -a 256 "StickyNote-$VERSION.dmg" > "StickyNote-$VERSION.dmg.sha256"
+
+      - name: Attest build provenance
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: build/StickyNote-${{ env.VERSION }}.dmg
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "build/StickyNote-$VERSION.dmg" \
+            "build/StickyNote-$VERSION.dmg.sha256" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "StickyNote $VERSION" \
+            --notes-file "$RUNNER_TEMP/release-notes.md" \
+            --verify-tag
+
+      - name: Remove signing keychain
+        if: always() && env.HAS_SIGNING_CERTIFICATE == 'true'
+        run: security delete-keychain "$RUNNER_TEMP/signing.keychain-db" || true

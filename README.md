@@ -1,93 +1,72 @@
 # StickyNote
 
-A small, native sticky notes app for macOS whose notes can be **pinned on top of every other window**.
+Sticky notes for macOS that can stay on top of other windows.
 
-## Features
+- Pin a note (pin button or ⇧⌘P) to keep it above all other apps, on every desktop, including
+  over full-screen apps.
+- Bold, italic, underline and strikethrough from the right-click menu or ⌘B / ⌘I / ⌘U.
+- Choose the font and text size in Settings (⌘,).
+- Six note colors.
+- Notes save as you type and reopen where you left them.
 
-- **Keep on Top**: pin a note with the 📌 button (or ⇧⌘P) and it floats above all other apps,
-  follows you to every desktop (Space), and stays visible over full-screen apps.
-- **Formatting**: right-click any text for Bold, Italic, Underline and Strikethrough.
-- **Settings** (⌘,): choose the font and text size used by all notes, with a live preview.
-- As many notes as you like, in six paper colors.
-- Saves automatically as you type; notes reopen where you left them.
-- Notes saved on a display that's no longer connected are moved back on screen.
-- Native and tiny (about 1 MB): no third-party dependencies, no network access.
+The app makes no network connections.
 
-### Keyboard shortcuts
+## Installing
 
-| Action                          | Shortcut |
-| ------------------------------- | -------- |
-| New note                        | ⌘N       |
-| Keep on top / stop              | ⇧⌘P      |
-| Bold / Italic / Underline       | ⌘B / ⌘I / ⌘U |
-| Change color                    | ⌘1 – ⌘6  |
-| Settings                        | ⌘,       |
-| Delete note (asks if not empty) | ⌘W       |
+Requires macOS 14 or later.
 
-## Requirements
+1. Download the `.dmg` file from the [latest release](https://github.com/imanless/stickynote/releases/latest).
+2. Open it and drag StickyNote into Applications.
+3. Open StickyNote.
 
-- macOS 14 Sonoma or later
-- To build: Xcode 16.3 or later (Swift 6.1+)
+The app isn't notarized by Apple yet, so the first time you open it macOS says it can't verify
+it. Click Done, then go to System Settings → Privacy & Security, scroll down, and click
+Open Anyway next to StickyNote. You only need to do this once.
 
-## Build and install
+To update, download the new `.dmg` and replace the app in Applications. Your notes are kept.
 
-```sh
-git clone https://github.com/imanless/stickynote.git
-cd stickynote
-make install      # builds StickyNote.app and copies it to /Applications
-```
+To check that a download is genuine, see [Verifying downloads](SECURITY.md#verifying-downloads).
 
-Or run `make app` and find the app at `build/StickyNote.app`.
+## Keyboard shortcuts
 
-## Development
+| Action                    | Shortcut     |
+| ------------------------- | ------------ |
+| New note                  | ⌘N           |
+| Keep on top               | ⇧⌘P          |
+| Bold / Italic / Underline | ⌘B / ⌘I / ⌘U |
+| Note color                | ⌘1 – ⌘6      |
+| Settings                  | ⌘,           |
+| Delete note               | ⌘W           |
 
-```sh
-make run      # build and run from the terminal
-make test     # run the unit tests
-make lint     # check formatting (make format fixes it)
-make help     # list all commands
-```
+## Your notes
 
-Everything is built inside this folder (`.build/` and `build/`). Nothing is installed elsewhere on
-your Mac, and `make clean` removes all build output.
-
-To experiment without touching your real notes, point the app at a different file:
-
-```sh
-swift run StickyNote -NotesFilePath /tmp/test-notes.json
-```
-
-### Project structure
-
-```
-Sources/
-  StickyNoteCore/   Note model and JSON storage (no UI, unit tested)
-  StickyNote/       The app: windows, menus, SwiftUI views
-Tests/
-  StickyNoteCoreTests/
-Support/Info.plist  App bundle metadata (name, version, bundle ID)
-scripts/            build-app.sh assembles StickyNote.app
-```
-
-## Where notes are stored
-
-All notes are kept in one readable JSON file:
-
-```
-~/Library/Application Support/StickyNote/notes.json
-```
-
-To store them elsewhere, for example in a synced folder:
+Notes are stored in `~/Library/Application Support/StickyNote/notes.json`. To store them
+somewhere else, for example a synced folder:
 
 ```sh
 defaults write io.github.imanless.StickyNote NotesFilePath ~/Dropbox/StickyNote/notes.json
 ```
 
-Formatting is stored next to each note's text as ranges, such as
-`{"style": "bold", "location": 0, "length": 13}`, so the file stays readable.
+To uninstall, delete StickyNote from Applications. To also remove your notes and settings:
 
-If the file is ever damaged, StickyNote renames it to `notes.unreadable-<date>.json` instead of
-overwriting it, and tells you where it is.
+```sh
+rm -rf ~/Library/Application\ Support/StickyNote
+defaults delete io.github.imanless.StickyNote
+```
 
-The font and size chosen in Settings are kept with your other macOS preferences, separately from
-the notes.
+## Building from source
+
+Requires Xcode 16.3 or later.
+
+```sh
+git clone https://github.com/imanless/stickynote.git
+cd stickynote
+make install
+```
+
+This builds the app and copies it to Applications. `make help` lists the other commands. See
+[CONTRIBUTING.md](CONTRIBUTING.md) if you'd like to make changes.
+
+## License
+
+[MIT](LICENSE)

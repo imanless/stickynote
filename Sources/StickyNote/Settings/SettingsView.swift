@@ -35,8 +35,10 @@ struct SettingsView: View {
             } header: {
                 Text("Text")
             } footer: {
-                Text("Used by every note that doesn’t have its own font. To change one note, use its palette button.")
-                    .foregroundStyle(.secondary)
+                Text(
+                    "Used by every note that doesn’t have its own font. To change one note, use its palette button. To change some words, select them and right-click."
+                )
+                .foregroundStyle(.secondary)
             }
 
             Section("Preview") {

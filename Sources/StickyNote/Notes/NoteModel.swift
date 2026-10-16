@@ -24,6 +24,7 @@ final class NoteModel {
     // while the window is dragged.
     @ObservationIgnored private(set) var text: String
     @ObservationIgnored private(set) var styles: [StyleRun]
+    @ObservationIgnored private(set) var fontRuns: [FontRun]
     @ObservationIgnored var frame: NoteFrame {
         didSet { onChange?() }
     }
@@ -35,6 +36,7 @@ final class NoteModel {
         createdAt = note.createdAt
         text = note.text
         styles = note.styles
+        fontRuns = note.fontRuns
         color = note.color
         font = note.font
         isPinned = note.isPinned
@@ -42,10 +44,11 @@ final class NoteModel {
         modifiedAt = note.modifiedAt
     }
 
-    func setContent(text: String, styles: [StyleRun]) {
-        guard text != self.text || styles != self.styles else { return }
+    func setContent(text: String, styles: [StyleRun], fontRuns: [FontRun]) {
+        guard text != self.text || styles != self.styles || fontRuns != self.fontRuns else { return }
         self.text = text
         self.styles = styles
+        self.fontRuns = fontRuns
         modifiedAt = Date()
         onChange?()
     }
@@ -55,6 +58,7 @@ final class NoteModel {
             id: id,
             text: text,
             styles: styles,
+            fontRuns: fontRuns,
             color: color,
             font: font,
             frame: frame,

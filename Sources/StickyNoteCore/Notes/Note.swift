@@ -9,6 +9,8 @@ public struct Note: Codable, Equatable, Identifiable, Sendable {
     public var text: String
     /// Bold, italic and other formatting applied to ranges of `text`.
     public var styles: [StyleRun]
+    /// Fonts and sizes chosen for ranges of `text`, on top of the note's `font`.
+    public var fontRuns: [FontRun]
     public var color: NoteColor
     /// The note's own font choices, on top of the app-wide default.
     public var font: FontOverride
@@ -22,6 +24,7 @@ public struct Note: Codable, Equatable, Identifiable, Sendable {
         id: UUID = UUID(),
         text: String = "",
         styles: [StyleRun] = [],
+        fontRuns: [FontRun] = [],
         color: NoteColor = .yellow,
         font: FontOverride = FontOverride(),
         frame: NoteFrame,
@@ -32,6 +35,7 @@ public struct Note: Codable, Equatable, Identifiable, Sendable {
         self.id = id
         self.text = text
         self.styles = styles
+        self.fontRuns = fontRuns
         self.color = color
         self.font = font
         self.frame = frame
@@ -48,6 +52,9 @@ public struct Note: Codable, Equatable, Identifiable, Sendable {
         // know (for example, added by a newer release) are skipped rather than failing the note.
         styles =
             try container.decodeIfPresent([SkippingInvalid<StyleRun>].self, forKey: .styles)?
+            .compactMap(\.value) ?? []
+        fontRuns =
+            try container.decodeIfPresent([SkippingInvalid<FontRun>].self, forKey: .fontRuns)?
             .compactMap(\.value) ?? []
         color = try container.decode(NoteColor.self, forKey: .color)
         // Missing in notes saved before per-note fonts; an unreadable value falls back to the

@@ -1,6 +1,6 @@
 /// One note's own font choices. Anything left `nil` follows the app-wide `FontSettings`, so a
 /// note that only changes its size still follows the default font, and the other way round.
-public struct FontOverride: Codable, Equatable, Sendable {
+public struct FontOverride: Codable, Hashable, Sendable {
     /// The `family` of a note that uses the system font even when the default is another font.
     public static let systemFamily = ""
 

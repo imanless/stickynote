@@ -6,6 +6,14 @@ All notable changes to StickyNote are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-16
+
+### Added
+
+- Words within a note can have their own font and size. Select them, then right-click and
+  choose Font or Size, or use the Format menu. "Same as Note" changes them back.
+- Text copied from one note to another keeps its fonts.
+
 ## [0.5.1] - 2026-10-16
 
 ### Fixed
@@ -54,7 +62,8 @@ All notable changes to StickyNote are listed here. The format follows
 - Six note colors.
 - Notes save automatically and reopen where you left them.
 
-[Unreleased]: https://github.com/imanless/stickynote/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/imanless/stickynote/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/imanless/stickynote/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/imanless/stickynote/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/imanless/stickynote/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/imanless/stickynote/compare/v0.3.0...v0.4.0

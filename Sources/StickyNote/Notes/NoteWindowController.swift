@@ -22,7 +22,6 @@ final class NoteWindowController: NSWindowController, NSWindowDelegate, NSMenuIt
     private let settings: AppSettings
     /// The font the text is drawn in: the default, with the note's own choices applied.
     private var font: FontSettings
-    private var richText: RichText
 
     private let textView = NoteWindowController.makeTextView()
     /// Distinguishes the user deleting the note from the window closing for any other reason.
@@ -32,7 +31,7 @@ final class NoteWindowController: NSWindowController, NSWindowDelegate, NSMenuIt
         self.model = model
         self.settings = settings
         font = model.font.applied(to: settings.font)
-        richText = RichText(font: font.nsFont)
+        textView.formatting = RichText(font: font)
         let window = NSWindow(
             contentRect: model.frame.rect,
             styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
@@ -70,12 +69,12 @@ final class NoteWindowController: NSWindowController, NSWindowDelegate, NSMenuIt
         window.delegate = self
     }
 
-    private static func makeTextView() -> NSTextView {
-        let textView = NSTextView(frame: .zero)
+    private static func makeTextView() -> NoteTextView {
+        let textView = NoteTextView(frame: .zero)
         textView.isRichText = true
         textView.allowsUndo = true
         textView.importsGraphics = false
-        textView.usesFontPanel = false  // Notes keep only bold, italic, underline and strikethrough.
+        textView.usesFontPanel = false  // Notes keep only the fonts chosen from their own Font menus.
         textView.drawsBackground = false
         textView.textContainerInset = NSSize(width: 8, height: 4)
         textView.isVerticallyResizable = true
@@ -114,14 +113,17 @@ final class NoteWindowController: NSWindowController, NSWindowDelegate, NSMenuIt
         window.makeFirstResponder(textView)
     }
 
-    /// Fills the text view from the note, drawn with the current `richText`.
+    /// Fills the text view from the note, drawn in the current `font`.
     private func redrawText() {
         guard let textStorage = textView.textStorage else { return }
+        let formatting = textView.formatting
         let selection = textView.selectedRanges
-        textStorage.setAttributedString(richText.attributedString(text: model.text, styles: model.styles))
+        textStorage.setAttributedString(
+            formatting.attributedString(text: model.text, styles: model.styles, fontRuns: model.fontRuns)
+        )
         textView.selectedRanges = selection  // Same text, so the old selection still fits.
         if textStorage.length == 0 {
-            textView.typingAttributes = richText.baseAttributes
+            textView.typingAttributes = formatting.baseAttributes
         }
         // Undo steps recorded before the redraw would bring back the old font.
         textView.undoManager?.removeAllActions()
@@ -165,7 +167,7 @@ final class NoteWindowController: NSWindowController, NSWindowDelegate, NSMenuIt
         let newFont = model.font.applied(to: settings.font)
         guard newFont != font else { return }
         font = newFont
-        richText = RichText(font: newFont.nsFont)
+        textView.formatting = RichText(font: newFont)
         redrawText()
     }
 
@@ -199,7 +201,19 @@ final class NoteWindowController: NSWindowController, NSWindowDelegate, NSMenuIt
 
     @objc func toggleTextStyle(_ sender: NSMenuItem) {
         guard let style = sender.representedObject as? TextStyle else { return }
-        textView.toggle(style, using: richText)
+        textView.toggle(style, using: textView.formatting)
+    }
+
+    /// Gives the selected text its own font, or, for "Same as Note", removes it.
+    @objc func changeTextFont(_ sender: NSMenuItem) {
+        let family = sender.representedObject as? String
+        textView.changeFont(using: textView.formatting, actionName: "Font") { $0.family = family }
+    }
+
+    /// Gives the selected text its own size, or, for "Same as Note", removes it.
+    @objc func changeTextSize(_ sender: NSMenuItem) {
+        let size = sender.representedObject as? Double
+        textView.changeFont(using: textView.formatting, actionName: "Text Size") { $0.size = size }
     }
 
     @objc func makeTextBigger(_ sender: Any?) {
@@ -229,20 +243,33 @@ final class NoteWindowController: NSWindowController, NSWindowDelegate, NSMenuIt
         case #selector(toggleTextStyle(_:)):
             guard let style = menuItem.representedObject as? TextStyle else { return false }
             menuItem.state = textView.selectionHas(style) ? .on : .off
+        case #selector(changeTextFont(_:)):
+            let families = textView.selectedFonts.map(\.family)
+            menuItem.state = Self.state(of: menuItem.representedObject as? String, in: families)
+        case #selector(changeTextSize(_:)):
+            let sizes = textView.selectedFonts.map(\.size)
+            menuItem.state = Self.state(of: menuItem.representedObject as? Double, in: sizes)
         default:
             break
         }
         return true
     }
 
+    /// On when all of the selection uses `value`, mixed when only part of it does.
+    private static func state<Value: Hashable>(of value: Value, in values: [Value]) -> NSControl.StateValue {
+        guard values.contains(value) else { return .off }
+        return Set(values).count == 1 ? .on : .mixed
+    }
+
     // MARK: - NSTextViewDelegate
 
     func textDidChange(_ notification: Notification) {
-        model.setContent(text: textView.string, styles: RichText.styleRuns(of: textView.attributedString()))
+        let text = textView.attributedString()
+        model.setContent(text: text.string, styles: RichText.styleRuns(of: text), fontRuns: RichText.fontRuns(of: text))
     }
 
-    /// Adds Bold, Italic, Underline and Strikethrough to the right-click menu, in place of the
-    /// standard Font submenu, whose font and color choices a note wouldn't keep.
+    /// Adds the note's own formatting choices to the right-click menu, in place of the standard
+    /// Font submenu, whose choices a note wouldn't keep.
     func textView(_ view: NSTextView, menu: NSMenu, for event: NSEvent, at charIndex: Int) -> NSMenu? {
         let fontMenuIndex = menu.items.firstIndex { item in
             item.submenu?.items.contains { $0.action == #selector(NSFontManager.addFontTrait(_:)) } ?? false
@@ -257,8 +284,11 @@ final class NoteWindowController: NSWindowController, NSWindowDelegate, NSMenuIt
         }
 
         // Target this note directly: right-clicking a note doesn't make it the frontmost window.
-        for (offset, style) in TextStyle.allCases.enumerated() {
-            menu.insertItem(style.menuItem(target: self), at: insertionIndex + offset)
+        let items =
+            TextStyle.allCases.map { $0.menuItem(target: self) }
+            + [FontMenus.fontItem(target: self), FontMenus.sizeItem(target: self)]
+        for (offset, item) in items.enumerated() {
+            menu.insertItem(item, at: insertionIndex + offset)
         }
         return menu
     }
@@ -277,7 +307,7 @@ final class NoteWindowController: NSWindowController, NSWindowDelegate, NSMenuIt
         guard editedMask.contains(.editedCharacters), editedRange.length > 0 else { return }
         // Text views only ever edit their text on the main thread.
         let richText: RichText? = MainActor.assumeIsolated {
-            textView.hasMarkedText() ? nil : self.richText
+            textView.hasMarkedText() ? nil : textView.formatting
         }
         richText?.normalize(textStorage, in: editedRange)
     }

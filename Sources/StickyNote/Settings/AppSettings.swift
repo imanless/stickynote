@@ -41,7 +41,6 @@ extension FontSettings {
     }
 
     /// The regular face of the chosen family, or the system font if that family isn't installed.
-    @MainActor
     var nsFont: NSFont {
         family.flatMap { NSFontManager.shared.font(withFamily: $0, traits: [], weight: 5, size: size) }
             ?? .systemFont(ofSize: size)

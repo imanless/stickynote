@@ -6,6 +6,13 @@ All notable changes to StickyNote are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-10-16
+
+### Fixed
+
+- Released copies now use the current macOS look on macOS 26, for example in the Font and Size
+  menus. They were built with an older Xcode than local builds.
+
 ## [0.5.0] - 2026-10-16
 
 ### Added
@@ -47,7 +54,8 @@ All notable changes to StickyNote are listed here. The format follows
 - Six note colors.
 - Notes save automatically and reopen where you left them.
 
-[Unreleased]: https://github.com/imanless/stickynote/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/imanless/stickynote/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/imanless/stickynote/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/imanless/stickynote/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/imanless/stickynote/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/imanless/stickynote/compare/v0.2.0...v0.3.0

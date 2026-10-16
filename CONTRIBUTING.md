@@ -4,7 +4,7 @@ How to set up the project, make a change, and get it merged.
 
 ## Setting up
 
-You need macOS 14 or later and Xcode 16.3 or later. The one dependency, Sparkle, is downloaded
+You need macOS 14 or later and Xcode 26 or later (16.3 works, with the older look). The one dependency, Sparkle, is downloaded
 automatically on the first build.
 
 ```sh

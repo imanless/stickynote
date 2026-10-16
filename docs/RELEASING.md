@@ -30,6 +30,13 @@ changelog has no entry for the version or the update signature doesn't match the
 To try it locally first: `VERSION=1.2.0 make appcast`. This uses the signing key in your
 keychain.
 
+## Xcode version
+
+Both workflows build with a pinned Xcode (`DEVELOPER_DIR` in
+[ci.yml](../.github/workflows/ci.yml) and [release.yml](../.github/workflows/release.yml)),
+because the macOS SDK an app is built with decides which system look it gets. To move to a
+newer Xcode, check that GitHub's `macos-26` runner image lists it, then change both files.
+
 ## Update signing key
 
 Updates are signed with an EdDSA key pair created by Sparkle's `generate_keys` tool.

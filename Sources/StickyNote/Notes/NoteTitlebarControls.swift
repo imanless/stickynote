@@ -4,25 +4,21 @@ import SwiftUI
 /// The color and pin buttons shown at the right of a note's title bar.
 struct NoteTitlebarControls: View {
     @Bindable var model: NoteModel
+    @State private var isChoosingColor = false
 
     var body: some View {
         HStack(spacing: 4) {
-            Menu {
-                Picker("Color", selection: $model.color) {
-                    ForEach(NoteColor.allCases, id: \.self) { color in
-                        Text(color.displayName).tag(color)
-                    }
-                }
-                .pickerStyle(.inline)
-                .labelsHidden()
+            Button {
+                isChoosingColor.toggle()
             } label: {
                 Image(systemName: "paintpalette")
             }
-            .menuStyle(.borderlessButton)
-            .menuIndicator(.hidden)
-            .fixedSize()
+            .buttonStyle(.borderless)
             .help("Change Color")
             .accessibilityLabel("Change Color")
+            .popover(isPresented: $isChoosingColor, arrowEdge: .bottom) {
+                ColorSwatches(selection: $model.color) { isChoosingColor = false }
+            }
 
             Button {
                 model.isPinned.toggle()

@@ -6,6 +6,13 @@ All notable changes to StickyNote are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-16
+
+### Changed
+
+- The palette button now shows the note colors themselves instead of a list of their names.
+  Click a color to use it; the current one has a checkmark.
+
 ## [0.3.0] - 2026-10-16
 
 ### Added
@@ -32,7 +39,8 @@ All notable changes to StickyNote are listed here. The format follows
 - Six note colors.
 - Notes save automatically and reopen where you left them.
 
-[Unreleased]: https://github.com/imanless/stickynote/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/imanless/stickynote/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/imanless/stickynote/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/imanless/stickynote/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/imanless/stickynote/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/imanless/stickynote/releases/tag/v0.1.0

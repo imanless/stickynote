@@ -9,7 +9,8 @@ Sticky notes for macOS that can stay on top of other windows.
 - Six note colors.
 - Notes save as you type and reopen where you left them.
 
-The app makes no network connections.
+The app only goes online to check for a newer version, about once a day, and only if you allow
+it.
 
 ## Installing
 
@@ -23,7 +24,9 @@ The app isn't notarized by Apple yet, so the first time you open it macOS says i
 it. Click Done, then go to System Settings → Privacy & Security, scroll down, and click
 Open Anyway next to StickyNote. You only need to do this once.
 
-To update, download the new `.dmg` and replace the app in Applications. Your notes are kept.
+StickyNote updates itself: when a new version is out, it shows what changed and installs it
+with one click. To check right away, choose StickyNote → Check for Updates…. Versions before
+0.3.0 can't do this; replace those once by downloading the new `.dmg`. Your notes are kept.
 
 To check that a download is genuine, see [Verifying downloads](SECURITY.md#verifying-downloads).
 

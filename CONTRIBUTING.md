@@ -4,7 +4,8 @@ How to set up the project, make a change, and get it merged.
 
 ## Setting up
 
-You need macOS 14 or later and Xcode 16.3 or later. There are no other dependencies.
+You need macOS 14 or later and Xcode 16.3 or later. The one dependency, Sparkle, is downloaded
+automatically on the first build.
 
 ```sh
 git clone https://github.com/imanless/stickynote.git

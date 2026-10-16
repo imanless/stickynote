@@ -1,7 +1,8 @@
 name: Release
 
-# Pushing a tag such as v1.2.0 builds the app, packages it, and publishes a GitHub release.
-# Signing and notarization run only when the secrets in docs/RELEASING.md are configured.
+# Pushing a tag such as v1.2.0 builds the app, packages it, and publishes a GitHub release with
+# the signed update feed that installed copies check. Developer ID signing and notarization run
+# only when their secrets in docs/RELEASING.md are configured.
 
 on:
   push:
@@ -68,8 +69,6 @@ jobs:
           echo "SIGNING_IDENTITY=$identity" >> "$GITHUB_ENV"
 
       - name: Build app
-        env:
-          BUILD_NUMBER: ${{ github.run_number }}
         run: scripts/build-app.sh
 
       - name: Create disk image
@@ -90,6 +89,18 @@ jobs:
           xcrun notarytool submit "$dmg" --key "$key" --key-id "$NOTARY_API_KEY_ID" --issuer "$NOTARY_API_ISSUER_ID" --wait
           xcrun stapler staple "$dmg"
           echo "NOTARIZED=true" >> "$GITHUB_ENV"
+
+      # Runs after notarization, which changes the disk image, so the update signature covers
+      # the final file.
+      - name: Create signed update feed
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: |
+          if [[ -z "$SPARKLE_PRIVATE_KEY" ]]; then
+            echo "::error::The SPARKLE_PRIVATE_KEY secret is missing. See docs/RELEASING.md."
+            exit 1
+          fi
+          scripts/make-appcast.sh
 
       - name: Explain first launch of unnotarized builds
         if: env.NOTARIZED != 'true'
@@ -117,6 +128,7 @@ jobs:
           gh release create "$GITHUB_REF_NAME" \
             "build/StickyNote-$VERSION.dmg" \
             "build/StickyNote-$VERSION.dmg.sha256" \
+            build/appcast.xml \
             --repo "$GITHUB_REPOSITORY" \
             --title "StickyNote $VERSION" \
             --notes-file "$RUNNER_TEMP/release-notes.md" \

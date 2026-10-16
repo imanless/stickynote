@@ -1,6 +1,7 @@
 # Architecture
 
-StickyNote is a Swift package with two modules and no third-party dependencies.
+StickyNote is a Swift package with two modules. Its one dependency is
+[Sparkle](https://sparkle-project.org), which installs updates.
 
 ```
 Sources/
@@ -9,7 +10,7 @@ Sources/
     Storage/             NoteStore: reads and writes notes.json
     Settings/            FontSettings, NewNoteDefaults, and the KeyValueStore they are saved to
   StickyNote/            The macOS app (AppKit, with SwiftUI for small views)
-    App/                 Entry point, app delegate, menu bar
+    App/                 Entry point, app delegate, menu bar, updater
     Notes/               One window per note, and the controller that owns them all
     Formatting/          Rich text: bold, italic, underline, strikethrough
     Settings/            Settings window and app-wide preferences
@@ -32,6 +33,8 @@ scripts/                 Build, packaging and release helpers
   stored form doesn't include fonts, changing the font in Settings simply redraws every note.
 - **`AppSettings`** holds preferences. `NotesController` reads them when creating a note, and
   is told when the font changes so it can redraw open notes.
+- **`AppUpdater`** wraps Sparkle. It reads the update feed published with each release (see
+  [RELEASING.md](RELEASING.md)) and offers new versions to the user.
 
 ## The notes file
 

@@ -21,11 +21,34 @@ when a version tag is pushed.
    ```
 
 The workflow then runs the tests, builds a universal `StickyNote.app` stamped with the version,
-packages it as `StickyNote-1.2.0.dmg`, records a signed build attestation, and publishes a
-GitHub release whose notes are the changelog entry. It fails without publishing anything if the
-changelog has no entry for the version.
+packages it as `StickyNote-1.2.0.dmg`, signs it for updates, records a signed build attestation,
+and publishes a GitHub release whose notes are the changelog entry. The release includes
+`appcast.xml`, the signed feed that installed copies check for updates, so publishing a release
+is also what offers it to existing users. The workflow fails without publishing anything if the
+changelog has no entry for the version or the update signature doesn't match the app.
 
-To try packaging locally first: `VERSION=1.2.0 make dmg`.
+To try it locally first: `VERSION=1.2.0 make appcast`. This uses the signing key in your
+keychain.
+
+## Update signing key
+
+Updates are signed with an EdDSA key pair created by Sparkle's `generate_keys` tool.
+
+- The **public key** is `SUPublicEDKey` in [Support/Info.plist](../Support/Info.plist). Never
+  change it: installed copies only accept updates signed with the matching private key.
+- The **private key** is kept in the maintainer's login keychain (account `stickynote`) and in
+  the `SPARKLE_PRIVATE_KEY` secret of the `release` environment. Releases fail without it.
+
+Keep a backup of the private key in a password manager. To export it:
+
+```sh
+.build/artifacts/sparkle/Sparkle/bin/generate_keys --account stickynote -x private-key.txt
+```
+
+Copy the file's contents into the password manager, then delete the file. If the key is lost,
+existing users can't receive updates until they download a version with a new key by hand. If
+it leaks, someone else could sign updates, so create a new key, ship it in a release right away,
+and tell users.
 
 ## Signing and notarization (optional)
 

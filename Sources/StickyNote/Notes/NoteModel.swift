@@ -38,7 +38,6 @@ final class NoteModel {
         modifiedAt = note.modifiedAt
     }
 
-    /// Records an edit to the note's text or formatting.
     func setContent(text: String, styles: [StyleRun]) {
         guard text != self.text || styles != self.styles else { return }
         self.text = text
@@ -47,7 +46,6 @@ final class NoteModel {
         onChange?()
     }
 
-    /// A value copy of the current state, for saving.
     var note: Note {
         Note(
             id: id,

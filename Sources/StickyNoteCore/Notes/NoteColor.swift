@@ -1,4 +1,3 @@
-/// The paper colors a note can have.
 public enum NoteColor: String, Codable, CaseIterable, Sendable {
     case yellow
     case pink

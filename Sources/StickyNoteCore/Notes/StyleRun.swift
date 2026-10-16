@@ -1,11 +1,3 @@
-/// Character formatting that can be applied to part of a note's text.
-public enum TextStyle: String, Codable, CaseIterable, Sendable {
-    case bold
-    case italic
-    case underline
-    case strikethrough
-}
-
 /// One style applied to a range of a note's text.
 ///
 /// Ranges are measured in UTF-16 code units, the same way `NSString` and `NSRange` count,
@@ -25,8 +17,7 @@ public struct StyleRun: Codable, Equatable, Sendable {
 
     /// Cleans up runs so they are safe to apply to a text of `textLength` UTF-16 code units:
     /// clamps them to the text, drops empty ones, and merges touching or overlapping runs of
-    /// the same style. The result is sorted by style (in declaration order), then location, so
-    /// saved files are stable.
+    /// the same style. Sorted by style, then location, so saved files are stable.
     public static func normalized(_ runs: [StyleRun], textLength: Int) -> [StyleRun] {
         let clamped = runs.compactMap { run -> StyleRun? in
             let location = min(max(run.location, 0), textLength)

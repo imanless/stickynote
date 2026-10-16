@@ -13,7 +13,7 @@ extension NoteColor {
         }
     }
 
-    /// Light "paper" tones. Notes always use the light appearance, so text on them stays dark.
+    /// Light paper tones. Notes always use the light appearance, so text on them stays dark.
     var nsColor: NSColor {
         switch self {
         case .yellow: NSColor(srgbRed: 1.00, green: 0.96, blue: 0.62, alpha: 1)
@@ -23,20 +23,5 @@ extension NoteColor {
         case .purple: NSColor(srgbRed: 0.87, green: 0.81, blue: 0.97, alpha: 1)
         case .gray: NSColor(srgbRed: 0.91, green: 0.91, blue: 0.91, alpha: 1)
         }
-    }
-}
-
-extension NoteFrame {
-    init(_ rect: NSRect) {
-        self.init(
-            x: rect.origin.x,
-            y: rect.origin.y,
-            width: rect.size.width,
-            height: rect.size.height
-        )
-    }
-
-    var rect: NSRect {
-        NSRect(x: x, y: y, width: width, height: height)
     }
 }

@@ -1,24 +1,23 @@
 import AppKit
 import StickyNoteCore
 
-/// Draws a note's text in the user's chosen font, and converts between the text system's
-/// attributed strings and a note's text plus `StyleRun`s.
+/// Draws a note's text in the user's chosen font, and converts between attributed strings
+/// and a note's text plus `StyleRun`s.
 ///
-/// Notes keep only the styles in `TextStyle`. Anything else, such as the fonts, sizes and colors
-/// of pasted text, is replaced by the note's standard look, so a note looks the same after
-/// relaunching as it did while editing.
+/// Only the styles in `TextStyle` are kept. Other formatting, such as the fonts and colors of
+/// pasted text, is replaced by the note's own look, so a note looks the same after relaunching.
 ///
 /// `@unchecked Sendable` because its only state is an `NSFont`, which is immutable and safe to
-/// share between threads, but isn't marked `Sendable` by AppKit.
+/// share between threads but isn't marked `Sendable` by AppKit.
 struct RichText: @unchecked Sendable {
     /// Bold and italic are recorded with these markers rather than read back from the font,
     /// because not every font has a bold or italic face to show them with.
     static let boldKey = NSAttributedString.Key("io.github.imanless.StickyNote.bold")
     static let italicKey = NSAttributedString.Key("io.github.imanless.StickyNote.italic")
 
-    /// How far synthesized italics lean, for fonts without an italic face.
+    /// Lean of synthesized italics, for fonts without an italic face.
     private static let syntheticObliqueness = 0.2
-    /// How thick synthesized bold strokes are (as a percentage of font size), for fonts without a bold face.
+    /// Stroke width of synthesized bold (percent of the font size), for fonts without a bold face.
     private static let syntheticBoldStrokeWidth = -3.0
 
     /// The regular face of the user's chosen font.
@@ -106,97 +105,5 @@ struct RichText: @unchecked Sendable {
         string.enumerateAttributes(in: range) { attributes, subrange, _ in
             string.setAttributes(self.attributes(for: Self.styles(in: attributes)), range: subrange)
         }
-    }
-}
-
-extension NSTextView {
-    /// Whether all of the selected text has `style`, or, with nothing selected, whether the
-    /// text typed next will.
-    func selectionHas(_ style: TextStyle) -> Bool {
-        let ranges = selectedTextRanges
-        guard !ranges.isEmpty, let textStorage else {
-            return RichText.styles(in: typingAttributes).contains(style)
-        }
-        return ranges.allSatisfy { range in
-            var hasStyle = true
-            textStorage.enumerateAttributes(in: range) { attributes, _, stop in
-                if !RichText.styles(in: attributes).contains(style) {
-                    hasStyle = false
-                    stop.pointee = true
-                }
-            }
-            return hasStyle
-        }
-    }
-
-    /// Turns `style` on for the selection, or off if all of it already has the style.
-    /// With nothing selected, it applies to the text typed next. Can be undone.
-    func toggle(_ style: TextStyle, using richText: RichText) {
-        let isOn = !selectionHas(style)
-        func updating(_ attributes: [NSAttributedString.Key: Any]) -> [NSAttributedString.Key: Any] {
-            var styles = RichText.styles(in: attributes)
-            if isOn {
-                styles.insert(style)
-            } else {
-                styles.remove(style)
-            }
-            return richText.attributes(for: styles)
-        }
-
-        typingAttributes = updating(typingAttributes)
-
-        let ranges = selectedTextRanges
-        guard !ranges.isEmpty, let textStorage,
-            shouldChangeText(inRanges: ranges.map { NSValue(range: $0) }, replacementStrings: nil)
-        else { return }
-
-        textStorage.beginEditing()
-        for range in ranges {
-            textStorage.enumerateAttributes(in: range) { attributes, subrange, _ in
-                textStorage.setAttributes(updating(attributes), range: subrange)
-            }
-        }
-        textStorage.endEditing()
-        didChangeText()
-        undoManager?.setActionName(style.displayName)
-    }
-
-    /// The selected ranges that contain text, ignoring a plain insertion point.
-    private var selectedTextRanges: [NSRange] {
-        selectedRanges.map(\.rangeValue).filter { $0.length > 0 }
-    }
-}
-
-extension TextStyle {
-    var displayName: String {
-        switch self {
-        case .bold: "Bold"
-        case .italic: "Italic"
-        case .underline: "Underline"
-        case .strikethrough: "Strikethrough"
-        }
-    }
-
-    /// The standard macOS shortcuts (⌘B, ⌘I, ⌘U). Strikethrough has no standard one.
-    private var keyEquivalent: String {
-        switch self {
-        case .bold: "b"
-        case .italic: "i"
-        case .underline: "u"
-        case .strikethrough: ""
-        }
-    }
-
-    /// A menu item that toggles this style. With no `target`, it acts on the frontmost note.
-    @MainActor
-    func menuItem(target: AnyObject? = nil) -> NSMenuItem {
-        let item = NSMenuItem(
-            title: displayName,
-            action: #selector(NoteWindowController.toggleTextStyle(_:)),
-            keyEquivalent: keyEquivalent
-        )
-        item.representedObject = self
-        item.target = target
-        return item
     }
 }

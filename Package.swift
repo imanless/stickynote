@@ -10,7 +10,6 @@ let package = Package(
     targets: [
         // UI-free model and persistence, kept separate so it can be unit tested.
         .target(name: "StickyNoteCore"),
-        // The macOS app: windows, menus and SwiftUI views.
         .executableTarget(
             name: "StickyNote",
             dependencies: ["StickyNoteCore"]

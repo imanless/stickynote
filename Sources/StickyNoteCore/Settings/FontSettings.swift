@@ -1,16 +1,6 @@
 import Foundation
 
-/// The parts of `UserDefaults` that settings need, so tests can use an in-memory store
-/// instead of writing to the user's preferences.
-public protocol KeyValueStore {
-    func object(forKey key: String) -> Any?
-    func set(_ value: Any?, forKey key: String)
-    func removeObject(forKey key: String)
-}
-
-extension UserDefaults: KeyValueStore {}
-
-/// The font every note is shown in, chosen in the Settings window.
+/// The font every note is shown in.
 public struct FontSettings: Equatable, Sendable {
     public static let sizeRange: ClosedRange<Double> = 9...72
     public static let standard = FontSettings(family: nil, size: defaultSize)
@@ -21,7 +11,7 @@ public struct FontSettings: Equatable, Sendable {
 
     /// A font family name such as "Helvetica Neue", or `nil` for the system font.
     public var family: String?
-    /// The point size, kept within `sizeRange`.
+    /// Point size, kept within `sizeRange`.
     public var size: Double
 
     public init(family: String?, size: Double) {

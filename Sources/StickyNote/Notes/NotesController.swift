@@ -27,7 +27,7 @@ final class NotesController: NoteWindowControllerDelegate {
     init(store: NoteStore, settings: AppSettings) {
         self.store = store
         self.settings = settings
-        settings.onChange = { [weak self] in self?.settingsDidChange() }
+        settings.onFontChange = { [weak self] in self?.fontDidChange() }
     }
 
     private var richText: RichText {
@@ -57,7 +57,7 @@ final class NotesController: NoteWindowControllerDelegate {
     }
 
     func createNote() {
-        let note = Note(frame: NoteFrame(frameForNewNote()))
+        let note = Note(frame: NoteFrame(frameForNewNote()), isPinned: settings.newNotes.isPinned)
         open(NoteModel(note: note))
         scheduleSave()
     }
@@ -99,7 +99,7 @@ final class NotesController: NoteWindowControllerDelegate {
 
     // MARK: - Private
 
-    private func settingsDidChange() {
+    private func fontDidChange() {
         let richText = richText
         for controller in windowControllers {
             controller.richText = richText

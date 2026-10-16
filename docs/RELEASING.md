@@ -8,7 +8,9 @@ when a version tag is pushed.
 1. Pick the version, following [Semantic Versioning](https://semver.org/): increase the third
    number for fixes, the second for new features, the first for breaking changes.
 2. In [CHANGELOG.md](../CHANGELOG.md), rename **Unreleased** to the new version and date, add a
-   new empty **Unreleased** section above it, and update the links at the bottom.
+   new empty **Unreleased** section above it, and update the links at the bottom. Set the same
+   version as `CFBundleShortVersionString` in [Support/Info.plist](../Support/Info.plist), so
+   local builds show it too.
 3. Merge that change into `main` through a pull request.
 4. Tag the merged commit and push the tag:
 

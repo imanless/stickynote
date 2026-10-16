@@ -2,7 +2,7 @@ import AppKit
 import StickyNoteCore
 import SwiftUI
 
-/// Lets the user choose the font and text size used by every note, with a live preview.
+/// Lets the user choose how new notes start out, and the font and text size of every note.
 struct SettingsView: View {
     private static let standardSizes: [Double] = [10, 11, 12, 13, 14, 16, 18, 20, 24, 28, 32, 36, 48]
 
@@ -11,7 +11,14 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-            Section("Notes") {
+            Section("New Notes") {
+                Toggle(isOn: $settings.newNotes.isPinned) {
+                    Text("Keep new notes on top")
+                    Text("New notes float above other apps. Use a note’s pin button to change it.")
+                }
+            }
+
+            Section("Text") {
                 Picker("Font", selection: $settings.font.family) {
                     Text("System Font").tag(String?.none)
                     Divider()

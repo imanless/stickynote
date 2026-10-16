@@ -6,6 +6,15 @@ All notable changes to StickyNote are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-16
+
+### Added
+
+- StickyNote now updates itself. It checks for new versions about once a day, after asking
+  permission, and installs them in place. Use StickyNote → Check for Updates… to check at any
+  time, or turn automatic checks off in Settings. Earlier versions have to be updated by
+  downloading this one manually.
+
 ## [0.2.0] - 2026-10-16
 
 ### Changed
@@ -23,6 +32,7 @@ All notable changes to StickyNote are listed here. The format follows
 - Six note colors.
 - Notes save automatically and reopen where you left them.
 
-[Unreleased]: https://github.com/imanless/stickynote/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/imanless/stickynote/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/imanless/stickynote/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/imanless/stickynote/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/imanless/stickynote/releases/tag/v0.1.0

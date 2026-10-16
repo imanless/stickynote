@@ -7,12 +7,14 @@ import StickyNoteCore
 /// reach the `NoteWindowController` of the frontmost note.
 @MainActor
 enum MainMenu {
-    static func make(appName: String) -> NSMenu {
+    static func make(appName: String, updater: AppUpdater) -> NSMenu {
         let windowMenu = windowMenu()
         NSApp.windowsMenu = windowMenu  // AppKit lists every open note here.
 
         let mainMenu = NSMenu()
-        let submenus = [appMenu(appName: appName), fileMenu(), editMenu(), formatMenu(), noteMenu(), windowMenu]
+        let submenus = [
+            appMenu(appName: appName, updater: updater), fileMenu(), editMenu(), formatMenu(), noteMenu(), windowMenu,
+        ]
         for submenu in submenus {
             let item = NSMenuItem(title: submenu.title, action: nil, keyEquivalent: "")
             item.submenu = submenu
@@ -21,13 +23,14 @@ enum MainMenu {
         return mainMenu
     }
 
-    private static func appMenu(appName: String) -> NSMenu {
+    private static func appMenu(appName: String, updater: AppUpdater) -> NSMenu {
         let menu = NSMenu(title: appName)
         menu.addItem(
             withTitle: "About \(appName)",
             action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)),
             keyEquivalent: ""
         )
+        menu.addItem(updater.makeMenuItem())
         menu.addItem(.separator())
         menu.addItem(withTitle: "Settings…", action: #selector(AppDelegate.showSettings(_:)), keyEquivalent: ",")
         menu.addItem(.separator())

@@ -2,8 +2,9 @@ import AppKit
 import SwiftUI
 
 final class SettingsWindowController: NSWindowController {
-    init(settings: AppSettings) {
-        let window = NSWindow(contentViewController: NSHostingController(rootView: SettingsView(settings: settings)))
+    init(settings: AppSettings, updater: AppUpdater) {
+        let window = NSWindow(
+            contentViewController: NSHostingController(rootView: SettingsView(settings: settings, updater: updater)))
         window.title = "Settings"
         window.styleMask = [.titled, .closable]
         window.tabbingMode = .disallowed

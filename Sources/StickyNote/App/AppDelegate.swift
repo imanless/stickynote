@@ -9,13 +9,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     static let notesFilePathKey = "NotesFilePath"
 
     private let settings = AppSettings()
+    private let updater = AppUpdater()
     private var notesController: NotesController?
     private var settingsWindowController: SettingsWindowController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Needed when running the bare executable (`swift run`), which has no Info.plist.
         NSApp.setActivationPolicy(.regular)
-        NSApp.mainMenu = MainMenu.make(appName: ProcessInfo.processInfo.processName)
+        NSApp.mainMenu = MainMenu.make(appName: ProcessInfo.processInfo.processName, updater: updater)
 
         let controller = NotesController(store: NoteStore(fileURL: Self.notesFileURL()), settings: settings)
         notesController = controller
@@ -45,7 +46,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func showSettings(_ sender: Any?) {
-        let controller = settingsWindowController ?? SettingsWindowController(settings: settings)
+        let controller =
+            settingsWindowController ?? SettingsWindowController(settings: settings, updater: updater)
         settingsWindowController = controller
         controller.showWindow(nil)
     }

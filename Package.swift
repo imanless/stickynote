@@ -7,12 +7,19 @@ let package = Package(
     products: [
         .executable(name: "StickyNote", targets: ["StickyNote"])
     ],
+    dependencies: [
+        // In-app updates. Pinned exactly; Dependabot proposes upgrades.
+        .package(url: "https://github.com/sparkle-project/Sparkle", exact: "2.10.0")
+    ],
     targets: [
         // UI-free model and persistence, kept separate so it can be unit tested.
         .target(name: "StickyNoteCore"),
         .executableTarget(
             name: "StickyNote",
-            dependencies: ["StickyNoteCore"]
+            dependencies: [
+                "StickyNoteCore",
+                .product(name: "Sparkle", package: "Sparkle"),
+            ]
         ),
         .testTarget(
             name: "StickyNoteCoreTests",

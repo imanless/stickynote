@@ -1,6 +1,6 @@
 APP := build/StickyNote.app
 
-.PHONY: help build run test format lint app dmg open install icon clean
+.PHONY: help build run test format lint app dmg appcast open install icon clean
 
 help: ## Show available commands
 	@grep -E '^[a-z]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  make %-8s %s\n", $$1, $$2}'
@@ -25,6 +25,9 @@ app: ## Build build/StickyNote.app
 
 dmg: app ## Build the app and package it as a disk image
 	./scripts/make-dmg.sh
+
+appcast: dmg ## Build the disk image and its signed update feed (uses your keychain key)
+	./scripts/make-appcast.sh
 
 open: app ## Build and launch the app
 	open $(APP)

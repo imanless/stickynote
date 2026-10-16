@@ -9,11 +9,24 @@ latest version.
 
 ## What StickyNote accesses
 
-StickyNote makes no network connections and collects no data. It reads and writes only:
+StickyNote collects no data. It reads and writes only:
 
 - its notes file, `~/Library/Application Support/StickyNote/notes.json` (or the path set with
   `NotesFilePath`), and
 - its own preferences (`io.github.imanless.StickyNote`).
+
+Its only network connection is the update check, made with
+[Sparkle](https://sparkle-project.org): about once a day, if the user allows it, it downloads
+`https://github.com/imanless/stickynote/releases/latest/download/appcast.xml`. No information
+about the Mac or its user is sent beyond what any download from GitHub includes.
+
+## Update signing
+
+Updates are signed with a private key that only the release workflow can use. The app contains
+the matching public key and accepts an update only when both the list of versions (the feed)
+and the downloaded file carry valid signatures from that key, so a modified or substituted
+download is refused. Each release is checked against the app's public key before it is
+published.
 
 ## Verifying downloads
 

@@ -8,6 +8,8 @@
 	<string>StickyNote</string>
 	<key>CFBundleExecutable</key>
 	<string>StickyNote</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
 	<string>io.github.imanless.StickyNote</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -26,6 +28,8 @@
 	<string>14.0</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © 2026 imanless. MIT License.</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 </dict>

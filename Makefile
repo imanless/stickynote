@@ -1,6 +1,6 @@
 APP := build/StickyNote.app
 
-.PHONY: help build run test format lint app open install clean
+.PHONY: help build run test format lint app dmg open install icon clean
 
 help: ## Show available commands
 	@grep -E '^[a-z]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  make %-8s %s\n", $$1, $$2}'
@@ -15,13 +15,16 @@ test: ## Run the unit tests
 	swift test
 
 format: ## Reformat all Swift code
-	swift format --in-place --recursive Package.swift Sources Tests
+	swift format --in-place --recursive Package.swift Sources Tests scripts
 
 lint: ## Check formatting without changing files
-	swift format lint --strict --recursive Package.swift Sources Tests
+	swift format lint --strict --recursive Package.swift Sources Tests scripts
 
 app: ## Build build/StickyNote.app
 	./scripts/build-app.sh
+
+dmg: app ## Build the app and package it as a disk image
+	./scripts/make-dmg.sh
 
 open: app ## Build and launch the app
 	open $(APP)
@@ -29,6 +32,9 @@ open: app ## Build and launch the app
 install: app ## Copy the app into /Applications
 	rm -rf /Applications/StickyNote.app
 	cp -R $(APP) /Applications/
+
+icon: ## Regenerate Support/AppIcon.icns from scripts/generate-icon.swift
+	./scripts/make-icon.sh
 
 clean: ## Remove all build output
 	swift package clean

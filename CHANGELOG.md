@@ -6,6 +6,13 @@ All notable changes to StickyNote are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-16
+
+### Changed
+
+- New notes are kept on top of other windows by default. Turn this off in Settings with
+  "Keep new notes on top".
+
 ## [0.1.0] - 2026-10-16
 
 ### Added
@@ -16,5 +23,6 @@ All notable changes to StickyNote are listed here. The format follows
 - Six note colors.
 - Notes save automatically and reopen where you left them.
 
-[Unreleased]: https://github.com/imanless/stickynote/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/imanless/stickynote/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/imanless/stickynote/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/imanless/stickynote/releases/tag/v0.1.0

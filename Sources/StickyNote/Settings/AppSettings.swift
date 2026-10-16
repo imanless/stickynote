@@ -10,16 +10,25 @@ final class AppSettings {
         didSet {
             guard font != oldValue else { return }
             font.save(to: defaults)
-            onChange?()
+            onFontChange?()
         }
     }
 
-    @ObservationIgnored var onChange: (() -> Void)?
+    /// Read when a note is created, so changing it needs no callback.
+    var newNotes: NewNoteDefaults {
+        didSet {
+            guard newNotes != oldValue else { return }
+            newNotes.save(to: defaults)
+        }
+    }
+
+    @ObservationIgnored var onFontChange: (() -> Void)?
     @ObservationIgnored private let defaults: UserDefaults
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         font = FontSettings(store: defaults)
+        newNotes = NewNoteDefaults(store: defaults)
     }
 }
 

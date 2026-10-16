@@ -7,7 +7,7 @@ Sources/
   StickyNoteCore/        Model and storage. Foundation only, no UI, fully unit tested.
     Notes/               Note, NoteColor, NoteFrame, TextStyle, StyleRun
     Storage/             NoteStore: reads and writes notes.json
-    Settings/            FontSettings and the KeyValueStore it is saved to
+    Settings/            FontSettings, NewNoteDefaults, and the KeyValueStore they are saved to
   StickyNote/            The macOS app (AppKit, with SwiftUI for small views)
     App/                 Entry point, app delegate, menu bar
     Notes/               One window per note, and the controller that owns them all
@@ -30,7 +30,8 @@ scripts/                 Build, packaging and release helpers
 - **`RichText`** converts between what the text view displays and what is stored: plain text
   plus a list of `StyleRun`s (for example "bold from character 0, length 5"). Because the
   stored form doesn't include fonts, changing the font in Settings simply redraws every note.
-- **`AppSettings`** holds preferences and tells `NotesController` when they change.
+- **`AppSettings`** holds preferences. `NotesController` reads them when creating a note, and
+  is told when the font changes so it can redraw open notes.
 
 ## The notes file
 
@@ -78,7 +79,8 @@ automatically. Add a round-trip test in `RichTextTests`.
 
 **A new setting**: add a value type with `init(store:)` and `save(to:)` in
 `StickyNoteCore/Settings` (see `FontSettings`), a property on `AppSettings`, a control in
-`SettingsView`, and react to it in `NotesController.settingsDidChange()`.
+`SettingsView`, and use it in `NotesController`: read it when needed, as `createNote()` does
+with `newNotes`, or add a callback like `onFontChange` if open notes must update at once.
 
 **A new menu command**: add the item in `MainMenu`. Commands that act on one note should be an
 `@objc` method on `NoteWindowController`, reached through the responder chain.

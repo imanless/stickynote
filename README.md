@@ -5,6 +5,7 @@ Sticky notes for macOS that can stay on top of other windows.
 - Notes stay above all other apps, on every desktop, including over full-screen apps. New notes
   start out pinned; unpin one with its pin button or ⇧⌘P, or change the default in Settings.
 - Bold, italic, underline and strikethrough from the right-click menu or ⌘B / ⌘I / ⌘U.
+- A different font or size for any words you select, from the right-click menu or the Format menu.
 - Six note colors, and a font and text size for each note, from the note's palette button.
 - Set the default font and size, and whether new notes are pinned, in Settings (⌘,).
 - Notes save as you type and reopen where you left them.

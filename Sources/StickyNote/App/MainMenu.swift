@@ -83,6 +83,9 @@ enum MainMenu {
         for style in TextStyle.allCases {
             menu.addItem(style.menuItem())
         }
+        menu.addItem(.separator())
+        menu.addItem(FontMenus.fontItem())
+        menu.addItem(FontMenus.sizeItem())
         return menu
     }
 

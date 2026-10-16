@@ -6,13 +6,13 @@ StickyNote is a Swift package with two modules. Its one dependency is
 ```
 Sources/
   StickyNoteCore/        Model and storage. Foundation only, no UI, fully unit tested.
-    Notes/               Note, NoteColor, FontOverride, NoteFrame, TextStyle, StyleRun
+    Notes/               Note, NoteColor, FontOverride, NoteFrame, TextStyle, StyleRun, FontRun
     Storage/             NoteStore: reads and writes notes.json
     Settings/            FontSettings, NewNoteDefaults, and the KeyValueStore they are saved to
   StickyNote/            The macOS app (AppKit, with SwiftUI for small views)
     App/                 Entry point, app delegate, menu bar, updater
     Notes/               One window per note, and the controller that owns them all
-    Formatting/          Rich text: bold, italic, underline, strikethrough
+    Formatting/          Rich text: styles and fonts of words, the note text view, Font and Size menus
     Settings/            Settings window and app-wide preferences
 Tests/
   StickyNoteCoreTests/   Model and storage tests
@@ -29,8 +29,11 @@ scripts/                 Build, packaging and release helpers
   on Top window level. Edits flow into its **`NoteModel`**, which reports them back to `NotesController`
   so they get saved.
 - **`RichText`** converts between what the text view displays and what is stored: plain text
-  plus a list of `StyleRun`s (for example "bold from character 0, length 5"). Because the
-  stored form doesn't include fonts, changing the font in Settings simply redraws every note.
+  plus a list of `StyleRun`s (for example "bold from character 0, length 5") and `FontRun`s
+  (for example "24 pt from character 0, length 5"). A font run stores only what was chosen for
+  that text and follows the note's font for the rest, so changing the font in Settings or in a
+  note's palette simply redraws the note. `NoteTextView` also copies text in this form, so
+  pasting it into another note keeps its fonts.
 - **`AppSettings`** holds preferences. `NotesController` reads them when creating a note, and
   is told when the font changes so it can redraw open notes.
 - **`AppUpdater`** wraps Sparkle. It reads the update feed published with each release (see
@@ -48,6 +51,7 @@ Notes are stored as readable JSON in `~/Library/Application Support/StickyNote/n
       "id" : "…",
       "text" : "Shopping list\nmilk",
       "styles" : [{ "style" : "bold", "location" : 0, "length" : 13 }],
+      "fontRuns" : [{ "font" : { "size" : 24 }, "location" : 0, "length" : 13 }],
       "color" : "yellow",
       "font" : { "size" : 18 },
       "isPinned" : true,

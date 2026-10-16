@@ -31,6 +31,7 @@ final class NoteStoreTests {
                     StyleRun(style: .bold, location: 0, length: 8),
                     StyleRun(style: .strikethrough, location: 9, length: 8),
                 ],
+                fontRuns: [FontRun(font: FontOverride(family: "Menlo", size: 24), location: 0, length: 8)],
                 color: .pink,
                 font: FontOverride(family: "Menlo", size: 18),
                 frame: NoteFrame(x: 10, y: 20, width: 300, height: 250),

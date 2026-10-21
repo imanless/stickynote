@@ -54,6 +54,12 @@ enum MainMenu {
         let menu = NSMenu(title: "File")
         menu.addItem(withTitle: "New Note", action: #selector(AppDelegate.newNote(_:)), keyEquivalent: "n")
         menu.addItem(.separator())
+        menu.addItem(
+            withTitle: "Add to Notes…",
+            action: #selector(NoteWindowController.addToNotes(_:)),
+            keyEquivalent: ""
+        )
+        menu.addItem(.separator())
         menu.addItem(withTitle: "Delete Note", action: #selector(NSWindow.performClose(_:)), keyEquivalent: "w")
         return menu
     }

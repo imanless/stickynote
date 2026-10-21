@@ -1,11 +1,13 @@
 import StickyNoteCore
 import SwiftUI
 
-/// The panel behind a note's palette button: the note's color, and its own font and size.
+/// The panel behind a note's palette button: the note's color, its own font and size, and a
+/// button to add it to Apple's Notes app.
 struct NoteStylePanel: View {
     @Bindable var model: NoteModel
     /// Read for the app-wide defaults, which the "Default" choices show.
     let settings: AppSettings
+    let addToNotes: () -> Void
 
     var body: some View {
         VStack(spacing: 0) {
@@ -32,6 +34,22 @@ struct NoteStylePanel: View {
                 }
             }
             .padding(12)
+
+            if let notesIcon = AppleNotes.icon {
+                Divider()
+
+                Button(action: addToNotes) {
+                    Label {
+                        Text("Add to Notes…")
+                    } icon: {
+                        Image(nsImage: notesIcon)
+                            .resizable()
+                            .frame(width: 16, height: 16)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(12)
+            }
         }
         .frame(width: 280)
     }

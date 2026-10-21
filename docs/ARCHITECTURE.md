@@ -11,7 +11,7 @@ Sources/
     Settings/            FontSettings, NewNoteDefaults, and the KeyValueStore they are saved to
   StickyNote/            The macOS app (AppKit, with SwiftUI for small views)
     App/                 Entry point, app delegate, menu bar, updater
-    Notes/               One window per note, and the controller that owns them all
+    Notes/               One window per note, the controller that owns them all, Add to Notes
     Formatting/          Rich text: styles and fonts of words, the note text view, Font and Size menus
     Settings/            Settings window and app-wide preferences
 Tests/
@@ -26,8 +26,9 @@ scripts/                 Build, packaging and release helpers
 - **`NotesController`** owns every open note. It loads notes at launch, creates and deletes
   note windows, and saves all notes to the `NoteStore` half a second after the last change.
 - **`NoteWindowController`** manages one note's window: its text view, color, font, and Keep
-  on Top window level. Edits flow into its **`NoteModel`**, which reports them back to `NotesController`
-  so they get saved.
+  on Top window level. Add to Notes hands the note's text to the share extension of Apple's
+  Notes app (`AppleNotes`), which needs no permission. Edits flow into its **`NoteModel`**,
+  which reports them back to `NotesController` so they get saved.
 - **`RichText`** converts between what the text view displays and what is stored: plain text
   plus a list of `StyleRun`s (for example "bold from character 0, length 5") and `FontRun`s
   (for example "24 pt from character 0, length 5"). A font run stores only what was chosen for

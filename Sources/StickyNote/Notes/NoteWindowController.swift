@@ -130,7 +130,11 @@ final class NoteWindowController: NSWindowController, NSWindowDelegate, NSMenuIt
     }
 
     private func installTitlebarControls(in window: NSWindow) {
-        let controls = NSHostingView(rootView: NoteTitlebarControls(model: model, settings: settings))
+        let controls = NSHostingView(
+            rootView: NoteTitlebarControls(model: model, settings: settings) { [weak self] in
+                self?.addToNotes(nil)
+            }
+        )
         controls.frame.size = controls.fittingSize
         let accessory = NSTitlebarAccessoryViewController()
         accessory.view = controls
@@ -216,6 +220,20 @@ final class NoteWindowController: NSWindowController, NSWindowDelegate, NSMenuIt
         textView.changeFont(using: textView.formatting, actionName: "Text Size") { $0.size = size }
     }
 
+    /// Shows Notes' panel for saving a copy of this note in the Notes app.
+    @objc func addToNotes(_ sender: Any?) {
+        guard !model.note.isBlank, let service = AppleNotes.makeService() else {
+            NSSound.beep()
+            return
+        }
+        // Notes isn't given a window to attach its panel to, so it shows the panel over the whole
+        // screen. Attached to the note, the panel is centered on the note and runs off the screen
+        // when the note is near an edge.
+        // Formatted text goes in the panel's text field. Other kinds of items, such as RTF data,
+        // would be shown as an attachment instead.
+        service.perform(withItems: [textView.attributedString()])
+    }
+
     @objc func makeTextBigger(_ sender: Any?) {
         stepTextSize(larger: true)
     }
@@ -236,6 +254,8 @@ final class NoteWindowController: NSWindowController, NSWindowDelegate, NSMenuIt
             return FontSettings.nextStandardSize(from: font.size, larger: true) != font.size
         case #selector(makeTextSmaller(_:)):
             return FontSettings.nextStandardSize(from: font.size, larger: false) != font.size
+        case #selector(addToNotes(_:)):
+            return !model.note.isBlank && AppleNotes.icon != nil
         case #selector(toggleKeepOnTop(_:)):
             menuItem.state = model.isPinned ? .on : .off
         case #selector(changeNoteColor(_:)):

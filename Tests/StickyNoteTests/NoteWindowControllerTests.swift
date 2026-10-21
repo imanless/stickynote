@@ -55,4 +55,14 @@ struct NoteWindowControllerTests {
         controller.changeTextSize(sameAsNote)
         #expect(model.note.fontRuns.isEmpty)
     }
+
+    @Test func addToNotesNeedsText() throws {
+        let item = NSMenuItem(
+            title: "Add to Notes…", action: #selector(NoteWindowController.addToNotes(_:)), keyEquivalent: "")
+        #expect(controller.validateMenuItem(item) == (AppleNotes.icon != nil))
+
+        textView.selectAll(nil)
+        textView.insertText("  \n", replacementRange: textView.selectedRange())
+        #expect(!controller.validateMenuItem(item))
+    }
 }

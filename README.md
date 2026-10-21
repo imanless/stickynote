@@ -7,6 +7,7 @@ Sticky notes for macOS that can stay on top of other windows.
 - Bold, italic, underline and strikethrough from the right-click menu or ⌘B / ⌘I / ⌘U.
 - A different font or size for any words you select, from the right-click menu or the Format menu.
 - Six note colors, and a font and text size for each note, from the note's palette button.
+- Save a copy of a note in Apple's Notes app, from the palette button or File → Add to Notes….
 - Set the default font and size, and whether new notes are pinned, in Settings (⌘,).
 - Notes save as you type and reopen where you left them.
 

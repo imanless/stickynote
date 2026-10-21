@@ -6,6 +6,13 @@ All notable changes to StickyNote are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-21
+
+### Added
+
+- Add to Notes… saves a copy of a note in Apple's Notes app. It's in the note's palette, and in
+  the File menu.
+
 ## [0.6.0] - 2026-10-16
 
 ### Added
@@ -62,7 +69,8 @@ All notable changes to StickyNote are listed here. The format follows
 - Six note colors.
 - Notes save automatically and reopen where you left them.
 
-[Unreleased]: https://github.com/imanless/stickynote/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/imanless/stickynote/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/imanless/stickynote/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/imanless/stickynote/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/imanless/stickynote/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/imanless/stickynote/compare/v0.4.0...v0.5.0

@@ -5,6 +5,7 @@ import SwiftUI
 struct NoteTitlebarControls: View {
     @Bindable var model: NoteModel
     let settings: AppSettings
+    let addToNotes: () -> Void
     @State private var isShowingStyle = false
 
     var body: some View {
@@ -18,7 +19,10 @@ struct NoteTitlebarControls: View {
             .help("Color and Font")
             .accessibilityLabel("Color and Font")
             .popover(isPresented: $isShowingStyle, arrowEdge: .bottom) {
-                NoteStylePanel(model: model, settings: settings)
+                NoteStylePanel(model: model, settings: settings) {
+                    isShowingStyle = false
+                    addToNotes()
+                }
             }
 
             Button {

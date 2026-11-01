@@ -9,7 +9,7 @@ let package = Package(
     ],
     dependencies: [
         // In-app updates. Pinned exactly; Dependabot proposes upgrades.
-        .package(url: "https://github.com/sparkle-project/Sparkle", exact: "2.10.0")
+        .package(url: "https://github.com/sparkle-project/Sparkle", exact: "2.10.1")
     ],
     targets: [
         // UI-free model and persistence, kept separate so it can be unit tested.
